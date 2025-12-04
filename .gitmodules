@@ -1,0 +1,3 @@
+[submodule "ece-707-lora-common"]
+	path = ece-707-lora-common
+	url = https://git.doit.wisc.edu/ibarbour/ece-707-lora-common.git
