@@ -18,12 +18,12 @@ const char *serverUrl = "http://172.20.10.3:8000/optimize";
 
 // --- TEST CONFIG ---
 uint8_t cfg_testPackets = 5;
-uint8_t cfg_threshold = 1;
+uint8_t cfg_threshold = 4;
 
 HT_st7735 st7735;
 
 // --- NETWORK DATA ---
-#define MAX_NODES 30
+#define MAX_NODES 50
 uint8_t searchQueue[MAX_NODES];
 uint8_t discoveredNodes[MAX_NODES];
 int queueHead = 0;
@@ -39,7 +39,7 @@ struct LinkStats
     int bestSF;
     long capacity;
 };
-LinkStats links[50];
+LinkStats links[MAX_NODES * 5];
 int linkCount = 0;
 
 // --- STATE ---
