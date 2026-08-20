@@ -12,9 +12,10 @@
 #include <HTTPClient.h>
 #include <ArduinoJson.h>
 
-const char *ssid = "IanPhone";
-const char *password = "theopen20";
-const char *serverUrl = "http://172.20.10.3:8000/optimize";
+const char *ssid = "__WIFI_SSID__";
+const char *password = "__WIFI_PASSWORD__";
+const char *ipAddress = "__WIFI_IP__";
+const char *serverUrl = "http://" + String(__WIFI_IP__) + ":8000/optimize";
 
 // --- TEST CONFIG ---
 uint8_t cfg_testPackets = 5;
@@ -43,7 +44,7 @@ LinkStats links[MAX_NODES * 5];
 int linkCount = 0;
 
 // --- STATE ---
-uint8_t sessionID = 0;
+uint8_t sessionID = 19;
 int discoveryRound = 0;
 int testNodeIndex = 0;
 int currentTestSF = 12;
@@ -153,10 +154,22 @@ void ConfigRadio(int sf)
                       LORA_SYMBOL_TIMEOUT, LORA_FIX_LENGTH_PAYLOAD_ON, 0, true, 0, 0, LORA_IQ_INVERSION_ON, true);
     Radio.Rx(0);
 }
+void printBytesInHex_sprintf(uint8_t* data_array, size_t length) {
+  char buffer[3]; // Buffer to hold 2 hex digits + null terminator
+
+  for (size_t i = 0; i < length; i++) {
+    // Format the byte as a 2-digit, zero-padded hex string into the buffer
+    sprintf(buffer, "%02X", data_array[i]); 
+    Serial.print(buffer);
+    Serial.print(" ");
+  }
+  Serial.println();
+}
 
 void SendDiscoveryReq()
 {
     uint8_t size = 7 + discoveredCount;
+    Serial.println(size);
     if (size > 250)
         size = 250;
 
@@ -171,14 +184,15 @@ void SendDiscoveryReq()
     tx[4] = (uint8_t)(window >> 8);
     tx[5] = (uint8_t)(window & 0xFF);
 
-    tx[6] = discoveredCount;
+    tx[6] = 0; //discoveredCount;
     for (int i = 0; i < discoveredCount; i++)
         if ((7 + i) < 250)
             tx[7 + i] = discoveredNodes[i];
 
     Serial.printf("[TX] Discovery Req (Window: %d ms)\n", window);
+    printBytesInHex_sprintf(tx, size);
     txDone = false;
-    Radio.Send(tx, size);
+    Radio.Send(tx, 7);
 }
 
 void SendPacket(uint8_t target, uint8_t type, uint8_t payload, uint8_t extra = 0)
